@@ -24,6 +24,7 @@ export class OpenAIService {
         image: file,
         size: "1024x1024",
       });
+      if (!result.data) return "No data";
       return `data:image/png;base64,${result.data[0].b64_json}`;
     } catch (error) {
       throw new Error(`Error: ${error}`);

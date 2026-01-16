@@ -3,13 +3,19 @@ import { useState } from "react";
 
 interface IPreviewIAProps {
   imageBase64: string;
+  urlImage: string;
 }
 
 const promptService = new Prompt();
-export default function PreviewIA({ imageBase64 }: IPreviewIAProps) {
+export default function PreviewIA({ imageBase64, urlImage }: IPreviewIAProps) {
   const [enhanced, setEnhanced] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
   const handleClick = async () => {
+    if (!urlImage) {
+      setError("Logo required");
+      return;
+    }
     setLoading(true);
     try {
       const response = await promptService.createPrompt(
@@ -53,6 +59,7 @@ export default function PreviewIA({ imageBase64 }: IPreviewIAProps) {
             />
           )}
         </div>
+        {!error && <span>{error}</span>}
       </div>
     </div>
   );

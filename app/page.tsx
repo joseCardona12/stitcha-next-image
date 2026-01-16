@@ -18,7 +18,7 @@ export default function Home() {
             setImageBase64={setImageBase64}
           />
         </section>
-        <PreviewIA imageBase64={imageBase64} />
+        <PreviewIA imageBase64={imageBase64} urlImage={urlImage} />
       </main>
     </div>
   );
