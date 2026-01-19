@@ -5,9 +5,10 @@ export async function POST(req: Request) {
   const openAiService = new OpenAIService();
   try {
     const result = await openAiService.generateMockup(base, prompt);
-    console.log("result", result);
     return NextResponse.json({
       message: "oK",
+      status: 200,
+      data: result,
     });
   } catch (error: any) {
     return NextResponse.json(
