@@ -1,17 +1,24 @@
 import { useEffect, useRef, useState } from "react";
 import * as fabric from "fabric";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Eye } from "lucide-react";
 import { loadImage } from "@/utils/loadImage";
+import { IImage } from "@/app/page";
 
 interface IPreviewDetailProps {
   urlImage: string;
   setUrlImage: (value: string) => void;
   setImageBase64: (value: string) => void;
+  images: IImage[];
+  setOpenModalPreviewIA: (value: boolean) => void;
+  setImageEnhanced: (value: string) => void;
 }
 
 export default function PreviewDetail({
   urlImage,
   setImageBase64,
+  images,
+  setImageEnhanced,
+  setOpenModalPreviewIA,
 }: IPreviewDetailProps) {
   const [isOutOfBounds, setIsOutOfBounds] = useState<boolean>(false);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -194,6 +201,27 @@ export default function PreviewDetail({
       >
         <div className="relative overflow-hidden">
           <canvas ref={canvasRef}></canvas>
+        </div>
+      </div>
+      <div className="w-full p-2 absolute bottom-10 left-0 flex flex-col gap-2 border border-gray-100 min-h-40">
+        <p>Generated images</p>
+        <div className="w-full flex gap-2 h-full">
+          {images.map((images, index) => (
+            <div className="w-30 relative" key={index}>
+              <button
+                className="bg-white p-1 rounded-md absolute top-1 right-1 cursor-pointer"
+                onClick={() => {
+                  setOpenModalPreviewIA(true);
+                  setImageEnhanced(images.url);
+                }}
+              >
+                <Eye className="w-4 h-4" />
+              </button>
+              <div className="w-full h-full object-contain">
+                <img src={images.url} className="rounded-md" />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>
