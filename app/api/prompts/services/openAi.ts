@@ -8,7 +8,6 @@ export class OpenAIService {
     const API_KEY: string = process.env.API_KEY ?? "";
     this.client = new OpenAI({
       apiKey: API_KEY,
-      dangerouslyAllowBrowser: true,
     });
   }
 

@@ -11,6 +11,10 @@ export class Prompt {
           base: base64Image,
         }),
       });
+      if (!result.ok) {
+        const text = await result.text();
+        throw new Error(`API error ${result.status}: ${text}`);
+      }
       return await result.json();
     } catch (error) {
       throw new Error(`${error}`);

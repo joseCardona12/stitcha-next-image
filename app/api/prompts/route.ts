@@ -2,6 +2,16 @@ import { NextResponse } from "next/server";
 import { OpenAIService } from "./services/openAi";
 export async function POST(req: Request) {
   const { prompt, base } = await req.json();
+  if (!prompt || !base) {
+    return NextResponse.json(
+      {
+        error: "Invalid paylod",
+      },
+      {
+        status: 400,
+      },
+    );
+  }
   const openAiService = new OpenAIService();
   try {
     const result = await openAiService.generateMockup(base, prompt);
