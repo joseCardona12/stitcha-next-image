@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { ImageService } from "./image.service";
 
+export const runtime = "nodejs";
 export async function POST(req: Request) {
   const formData = await req.formData();
   const file = formData.get("image") as File;
