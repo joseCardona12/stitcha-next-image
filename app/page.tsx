@@ -22,7 +22,6 @@ export default function Home() {
   const [openModalPreviewIA, setOpenModalPreviewIA] = useState<boolean>(false);
   const [imageEnhanced, setImageEnhanced] = useState<string>("");
   const [images, setImages] = useState<IImage[]>([]);
-  console.log("image base 64", imageBase64);
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="grid grid-cols-[400px_auto_300px] h-full w-full realtive">
