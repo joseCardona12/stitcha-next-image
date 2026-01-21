@@ -5,6 +5,7 @@ export class ImageService {
   private client: S3Client;
   constructor() {
     this.client = S3;
+    console.log("this client", this.client);
   }
 
   public async uploadImage(file: Buffer, fileName: string, fileType: string) {
