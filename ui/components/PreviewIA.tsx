@@ -1,5 +1,6 @@
 import { IImage } from "@/app/page";
-import { Prompt } from "@/services/promps";
+import { promptOpenAiService } from "@/services/promps";
+import { s3ImageService } from "@/services/s3Image";
 import { Eye } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
 
@@ -12,8 +13,6 @@ interface IPreviewIAProps {
   setImages: Dispatch<SetStateAction<IImage[]>>;
   images: IImage[];
 }
-
-const promptService = new Prompt();
 export default function PreviewIA({
   imageBase64,
   urlImage,
@@ -25,17 +24,41 @@ export default function PreviewIA({
 }: IPreviewIAProps) {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const handleClick = async () => {
-    setImageEnhanced("");
-    if (!urlImage) {
-      setError("Logo required");
-      return;
-    }
-    setLoading(true);
+
+  const generateURLImageS3 = async () => {
     try {
-      const response = await promptService.createPrompt(
-        `
-                      Create a high-resolution, photorealistic apparel mockup.
+      const response = await s3ImageService.uploadImage(imageBase64);
+      const url = response?.data?.url ?? "";
+      return url;
+    } catch (error) {
+      setError(`ERROR: ${error}`);
+      return ``;
+    }
+  };
+
+  const generateOpenAIImage = async (propmt: string, url: string) => {
+    try {
+      const result = await promptOpenAiService.createPrompt(propmt, url);
+      const urlImageEnhaced = result?.data?.url ?? "";
+      const newImage: IImage = {
+        logoUrl: `${urlImage}-01`,
+        name: result?.data.key ?? "",
+        url: result?.data.url,
+      };
+      setImageEnhanced(urlImageEnhaced);
+      setImages((prev) => [...prev, newImage]);
+    } catch (error) {
+      setError(`ERROR: ${error}`);
+    }
+  };
+
+  const handleClick = async () => {
+    setLoading(true);
+    const url = await generateURLImageS3();
+    if (!url) return;
+    await generateOpenAIImage(
+      `
+      Create a high-resolution, photorealistic apparel mockup.
       Use the provided image as a strict visual reference for logo placement.
       The logo must remain exactly in the same position, relative to the garment seams, folds, and proportions as shown in the reference image.
       Do not recenter, rebalance, align, or correct the logo placement.
@@ -48,22 +71,10 @@ export default function PreviewIA({
       – lighting and fabric wrinkles
       Keep the logo locked to the same garment area at all times.
       Neutral studio background, professional fashion lighting, realistic fabric texture, commercial mockup quality.
-            `,
-        imageBase64,
-      );
-      setImageEnhanced(response?.data);
-      const newImage: IImage = {
-        url: response?.data,
-        logoUrl: urlImage ?? "",
-        name: `image-generate-ia-${response?.data}`,
-      };
-      setImages((prev) => [...prev, newImage]);
-    } catch (error) {
-      console.log("....error", error);
-      setError(`ERROR: ${error}`);
-    } finally {
-      setLoading(false);
-    }
+      `,
+      url,
+    );
+    setLoading(false);
   };
   return (
     <div className="border-l border-gray-200 p-4 flex flex-col gap-2">

@@ -1,5 +1,5 @@
-export class Prompt {
-  public async createPrompt(prompt: string, base64Image: string) {
+export class PromptService {
+  public async createPrompt(prompt: string, urlImage: string) {
     try {
       const result = await fetch("/api/prompts", {
         method: "POST",
@@ -8,7 +8,7 @@ export class Prompt {
         },
         body: JSON.stringify({
           prompt,
-          base: base64Image,
+          urlImage,
         }),
       });
       if (!result.ok) {
@@ -21,3 +21,5 @@ export class Prompt {
     }
   }
 }
+
+export const promptOpenAiService = new PromptService();

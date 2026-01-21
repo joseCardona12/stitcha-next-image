@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { OpenAIService } from "./services/openAi";
+import { OpenAIService } from "./openAi.service";
 export async function POST(req: Request) {
-  const { prompt, base } = await req.json();
-  if (!prompt || !base) {
+  const { prompt, urlImage } = await req.json();
+  if (!prompt || !urlImage) {
     return NextResponse.json(
       {
         error: "Invalid paylod",
@@ -14,7 +14,11 @@ export async function POST(req: Request) {
   }
   const openAiService = new OpenAIService();
   try {
-    const result = await openAiService.generateMockup(base, prompt);
+    const imageBuffer = await openAiService.urlToBuffer(urlImage);
+    const file = new File([Buffer.from(imageBuffer)], "image.png", {
+      type: "image/png",
+    });
+    const result = await openAiService.generateMockup(file, prompt);
     return NextResponse.json({
       message: "oK",
       status: 200,
