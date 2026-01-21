@@ -1,5 +1,5 @@
 export const ENVS = {
-  AWS_REGION: process.env.AWS_REGION ?? "",
-  AWS_ACCESS_KEY: process.env.AWS_ACCESS_KEY_ID ?? "",
-  AWS_SECRET_ACCESS: process.env.AWS_SECRET_ACCESS_KEY ?? "",
+  AWS_REGION: process.env.REGION ?? "",
+  AWS_ACCESS_KEY: process.env.ACCESS_KEY_ID ?? "",
+  AWS_SECRET_ACCESS: process.env.SECRET_ACCESS_KEY ?? "",
 };
