@@ -14,11 +14,7 @@ export async function POST(req: Request) {
   }
   const openAiService = new OpenAIService();
   try {
-    const imageBuffer = await openAiService.urlToBuffer(urlImage);
-    const file = new File([Buffer.from(imageBuffer)], "image.png", {
-      type: "image/png",
-    });
-    const result = await openAiService.generateMockup(file, prompt);
+    const result = await openAiService.generateMockup(prompt, urlImage);
     return NextResponse.json({
       message: "oK",
       status: 200,
