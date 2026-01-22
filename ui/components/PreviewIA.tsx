@@ -1,6 +1,7 @@
 import { IImage } from "@/app/page";
 import { promptOpenAiService } from "@/services/promps";
 import { s3ImageService } from "@/services/s3Image";
+import { PROMPT_IMAGE } from "@/utils/constants/promptImage";
 import { Eye } from "lucide-react";
 import { Dispatch, SetStateAction, useState } from "react";
 
@@ -56,24 +57,7 @@ export default function PreviewIA({
     setLoading(true);
     const url = await generateURLImageS3();
     if (!url) return;
-    await generateOpenAIImage(
-      `
-      Create a high-resolution, photorealistic apparel mockup.
-      Use the provided image as a strict visual reference for logo placement.
-      The logo must remain exactly in the same position, relative to the garment seams, folds, and proportions as shown in the reference image.
-      Do not recenter, rebalance, align, or correct the logo placement.
-      The logo position is intentionally off-center and must be preserved exactly.
-      Treat the logo as printed directly onto the fabric at fixed coordinates.
-      The logo must not move, scale, rotate, warp, or shift, even if the model pose or camera angle changes.
-      Generate variations by changing only:
-      – the model pose
-      – the camera angle
-      – lighting and fabric wrinkles
-      Keep the logo locked to the same garment area at all times.
-      Neutral studio background, professional fashion lighting, realistic fabric texture, commercial mockup quality.
-      `,
-      url,
-    );
+    await generateOpenAIImage(PROMPT_IMAGE, url);
     setLoading(false);
   };
   return (

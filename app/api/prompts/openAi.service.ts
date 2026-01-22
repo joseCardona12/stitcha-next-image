@@ -15,32 +15,38 @@ export class OpenAIService {
     this.imageService = new ImageService();
   }
 
-  public async urlToBuffer(url: string): Promise<Buffer> {
+  public async urlToFile(url: string): Promise<File> {
     const res = await fetch(url);
     if (!res.ok) throw new Error("Failed to fetch image");
-    return Buffer.from(await res.arrayBuffer());
+    const arrayBuffer = await res.arrayBuffer();
+    const file = new File([arrayBuffer], "reference.png", {
+      type: "image/png",
+    });
+    return file;
   }
 
-  public async generateMockup(file: File, prompt: string) {
+  public async generateMockup(prompt: string, urlImage: string) {
+    console.log("prompt", prompt, urlImage);
     try {
+      const file = await this.urlToFile(urlImage);
       const result = await this.client.images.edit({
         model: "gpt-image-1",
-        prompt,
         image: file,
+        prompt,
         size: "1024x1024",
       });
       if (!result.data || !result.data[0].b64_json)
-        throw new Error("No image returned from OpenAI");
+        throw new Error("No Image returned from OpenAI");
       const base64Image = result.data[0].b64_json;
       const buffer = Buffer.from(base64Image, "base64");
-      const responseIMageService = await this.imageService.uploadImage(
+      const responseImageService = await this.imageService.uploadImage(
         buffer,
         `mockup-${Date.now()}.png`,
         "image/png",
       );
-      return responseIMageService;
+      return responseImageService;
     } catch (error) {
-      throw new Error(`Error: ${error}`);
+      console.log("error", error);
     }
   }
 }
