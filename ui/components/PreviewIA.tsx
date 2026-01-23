@@ -57,7 +57,6 @@ export default function PreviewIA({
       const res = await fetch(`/api/job-status?jobId=${jobID}`);
       const data = await res.json();
 
-      console.log("data", data);
       if (data?.status === "COMPLETED") {
         clearInterval(interval);
         setImageEnhanced(`${data?.imageUrl}`);
