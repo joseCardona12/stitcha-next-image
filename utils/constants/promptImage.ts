@@ -1,20 +1,38 @@
 export const PROMPT_IMAGE: string = `
-Create a high-resolution, photorealistic apparel mockup.
+The logo must look digitally printed onto fabric, not overlaid:
 
-Use the provided image as a strict reference for logo placement.
-The logo must remain EXACTLY in the same position relative to garment seams, folds, and proportions.
-Do not move, scale, rotate, warp, re-center, or correct the logo in any way.
-The off-center placement is intentional and must be preserved.
+– slight ink absorption into fibers
+– soft edges (no hard vector outlines)
+– micro texture bleeding following fabric weave
+– subtle ink density variations
+– minor print imperfections (real POD behavior)
+– no embossing, no embroidery, no 3D raised effect
 
-Only vary:
+The print must react naturally to:
+– fabric wrinkles
+– garment stretching
+– lighting direction
+– shadows and folds
+
+The logo must bend, distort and break only due to fabric movement, never by repositioning.
+
+Allowed changes ONLY:
+
 – model pose
 – camera angle
-– lighting
-– natural fabric wrinkles
+– lighting setup
+– natural garment wrinkles and tension
 
-The logo must stay locked to the same garment area at all times.
-Neutral studio background, professional fashion lighting, realistic fabric texture, commercial mockup quality.
+Photography & styling:
 
-Respond concisely.
-Do not explain the result. Only generate the mockup.
+– neutral studio or real lifestyle background
+– professional fashion photography lighting
+– realistic cotton / jersey fabric texture
+– commercial e-commerce quality
+– true-to-life color reproduction
+
+The logo must stay physically attached to the garment surface at all times.
+
+Output only the final mockup image.
+No explanations. No text.
 `;
