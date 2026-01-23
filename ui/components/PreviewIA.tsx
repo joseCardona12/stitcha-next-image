@@ -26,15 +26,50 @@ export default function PreviewIA({
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  const generateURLImageS3 = async () => {
+  const uplodToS3 = async () => {
     try {
-      const response = await s3ImageService.uploadImage(imageBase64);
-      const url = response?.data?.url ?? "";
-      return url;
+      const result = await s3ImageService.uploadImage(imageBase64);
+      return result?.data?.url;
     } catch (error) {
-      setError(`ERROR: ${error}`);
-      return ``;
+      throw new Error(`Error to generate url image. ERROR: ${error}`);
     }
+  };
+
+  const startJob = async (prompt: string, generatedURLImage: string) => {
+    try {
+      const result = await fetch("/api/start-job", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt,
+          urlImage: generatedURLImage,
+        }),
+      });
+      console.log("result", result);
+      const data = await result.json();
+      return data?.jobId;
+    } catch (error) {
+      throw new Error(`ERROR: ${error}`);
+    }
+  };
+
+  const startPolling = (jobID: string) => {
+    const interval = setInterval(async () => {
+      const res = await fetch(`/api/job-status?jobId=${jobID}`);
+      const data = await res.json();
+      console.log("data", data);
+      console.log("data status", data?.status);
+
+      if (data?.status === "COMPLETED") {
+        clearInterval(interval);
+        setImageEnhanced(`data:image/png;base64,${data.urlImage}`);
+      }
+
+      if (data?.status === "ERROR") {
+        clearInterval(interval);
+        alert("Error procesando la imagen");
+      }
+    }, 10000);
   };
 
   const generateOpenAIImage = async (propmt: string, url: string) => {
@@ -54,11 +89,11 @@ export default function PreviewIA({
   };
 
   const handleClick = async () => {
-    setLoading(true);
-    const url = await generateURLImageS3();
-    if (!url) return;
-    await generateOpenAIImage(PROMPT_IMAGE, url);
-    setLoading(false);
+    const url = await uplodToS3();
+    console.log("url", url);
+    const getJobID = await startJob(PROMPT_IMAGE, url ?? "");
+    console.log("get job id", getJobID);
+    startPolling(getJobID);
   };
   return (
     <div className="border-l border-gray-200 p-4 flex flex-col gap-2">
