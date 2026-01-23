@@ -203,27 +203,6 @@ export default function PreviewDetail({
           <canvas ref={canvasRef}></canvas>
         </div>
       </div>
-      <div className="w-full p-2 absolute bottom-10 left-0 flex flex-col gap-2 border border-gray-100 min-h-40">
-        <p>Generated images</p>
-        <div className="w-full flex gap-2 h-full">
-          {images.map((images, index) => (
-            <div className="w-30 relative" key={index}>
-              <button
-                className="bg-white p-1 rounded-md absolute top-1 right-1 cursor-pointer"
-                onClick={() => {
-                  setOpenModalPreviewIA(true);
-                  setImageEnhanced(images.url);
-                }}
-              >
-                <Eye className="w-4 h-4" />
-              </button>
-              <div className="w-full h-full object-contain">
-                <img src={images.url} className="rounded-md" />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }

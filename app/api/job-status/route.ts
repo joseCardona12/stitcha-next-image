@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
   console.log("result", result);
 
   if (!result.Item) {
-    return NextResponse.json({ status: "PROCESSING" });
+    return NextResponse.json({ status: "PROCESSING", imageUrl: "", jobId });
   }
 
   return NextResponse.json(result.Item);
