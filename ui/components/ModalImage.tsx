@@ -9,8 +9,8 @@ export default function ModalImage({
   setOpenModalPreviewIA,
 }: IModalImageProps) {
   return (
-    <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center">
-      <div className="bg-white p-6 rounded-md flex flex-col gap-2 relative">
+    <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center z-100">
+      <div className="bg-white shadow-sm p-6 rounded-md flex flex-col gap-2 relative">
         <button
           className="bg-red-300 rounded-md absolute top-3 right-3 p-1 cursor-pointer hover:bg-red-500 transition-colors duration-150"
           onClick={() => setOpenModalPreviewIA(false)}
@@ -18,7 +18,7 @@ export default function ModalImage({
           <X className="w-4 h-4" />
         </button>
         <h4 className="font-medium">Preview IA Generate</h4>
-        <div className="border border-gray-100 rounded-md w-180 h-180">
+        <div className="border border-gray-100 rounded-md w-210 h-210">
           {urlImage ? (
             <img
               src={urlImage}

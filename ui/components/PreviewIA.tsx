@@ -45,7 +45,6 @@ export default function PreviewIA({
           urlImage: generatedURLImage,
         }),
       });
-      console.log("result", result);
       const data = await result.json();
       return data?.jobId;
     } catch (error) {
@@ -57,12 +56,12 @@ export default function PreviewIA({
     const interval = setInterval(async () => {
       const res = await fetch(`/api/job-status?jobId=${jobID}`);
       const data = await res.json();
-      console.log("data", data);
-      console.log("data status", data?.status);
 
       if (data?.status === "COMPLETED") {
         clearInterval(interval);
-        setImageEnhanced(`data:image/png;base64,${data.urlImage}`);
+        setImageEnhanced(`${data?.imageUrl}`);
+        setLoading(false);
+        return;
       }
 
       if (data?.status === "ERROR") {
@@ -72,27 +71,10 @@ export default function PreviewIA({
     }, 10000);
   };
 
-  const generateOpenAIImage = async (propmt: string, url: string) => {
-    try {
-      const result = await promptOpenAiService.createPrompt(propmt, url);
-      const urlImageEnhaced = result?.data?.url ?? "";
-      const newImage: IImage = {
-        logoUrl: `${urlImage}-01`,
-        name: result?.data.key ?? "",
-        url: result?.data.url,
-      };
-      setImageEnhanced(urlImageEnhaced);
-      setImages((prev) => [...prev, newImage]);
-    } catch (error) {
-      setError(`ERROR: ${error}`);
-    }
-  };
-
   const handleClick = async () => {
+    setLoading(true);
     const url = await uplodToS3();
-    console.log("url", url);
     const getJobID = await startJob(PROMPT_IMAGE, url ?? "");
-    console.log("get job id", getJobID);
     startPolling(getJobID);
   };
   return (
