@@ -1,4 +1,5 @@
-import { IImage } from "@/app/page";
+import { IImage, IModalMessage } from "@/app/page";
+import { jobService } from "@/services/job";
 import { promptOpenAiService } from "@/services/promps";
 import { s3ImageService } from "@/services/s3Image";
 import { PROMPT_IMAGE } from "@/utils/constants/promptImage";
@@ -13,6 +14,7 @@ interface IPreviewIAProps {
   imageEnhanced: string;
   setImages: Dispatch<SetStateAction<IImage[]>>;
   images: IImage[];
+  setOpenModalMessage: (value: IModalMessage) => void;
 }
 export default function PreviewIA({
   imageBase64,
@@ -21,6 +23,7 @@ export default function PreviewIA({
   setOpenModalPreviewIA,
   setImageEnhanced,
   setImages,
+  setOpenModalMessage,
   images,
 }: IPreviewIAProps) {
   const [loading, setLoading] = useState<boolean>(false);
@@ -37,41 +40,47 @@ export default function PreviewIA({
 
   const startJob = async (prompt: string, generatedURLImage: string) => {
     try {
-      const result = await fetch("/api/start-job", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          prompt,
-          urlImage: generatedURLImage,
-        }),
-      });
-      const data = await result.json();
-      return data?.jobId;
+      const response = await jobService.startJob(prompt, generatedURLImage);
+      return response?.jobId;
     } catch (error) {
       throw new Error(`ERROR: ${error}`);
     }
   };
+  const getJobStatus = async (jobID: string, interval: NodeJS.Timeout) => {
+    const data = await jobService.getStatus(jobID);
+    if (data?.status === "COMPLETED") {
+      clearInterval(interval);
+      setImageEnhanced(`${data?.imageUrl}`);
+      setOpenModalMessage({
+        message: "Success to generate image",
+        open: true,
+        type: "success",
+      });
+      setLoading(false);
+      return;
+    }
+
+    if (data?.status === "ERROR" || data?.status === "FAILED") {
+      clearInterval(interval);
+      setLoading(false);
+      setOpenModalMessage({
+        message: "ERROR to generate image",
+        open: true,
+        type: "error",
+      });
+      return;
+    }
+  };
 
   const startPolling = (jobID: string) => {
-    const interval = setInterval(async () => {
-      const res = await fetch(`/api/job-status?jobId=${jobID}`);
-      const data = await res.json();
-
-      if (data?.status === "COMPLETED") {
-        clearInterval(interval);
-        setImageEnhanced(`${data?.imageUrl}`);
-        setLoading(false);
-        return;
-      }
-
-      if (data?.status === "ERROR") {
-        clearInterval(interval);
-        alert("Error procesando la imagen");
-      }
-    }, 10000);
+    const interval = setInterval(
+      async () => getJobStatus(jobID, interval),
+      10000,
+    );
   };
 
   const handleClick = async () => {
+    setImageEnhanced(""); // Clear image
     setLoading(true);
     const url = await uplodToS3();
     const getJobID = await startJob(PROMPT_IMAGE, url ?? "");

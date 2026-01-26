@@ -1,4 +1,5 @@
 import { X } from "lucide-react";
+import ZoomImage from "./ZoomImage";
 
 interface IModalImageProps {
   urlImage: string;
@@ -20,11 +21,7 @@ export default function ModalImage({
         <h4 className="font-medium">Preview IA Generate</h4>
         <div className="border border-gray-100 rounded-md w-210 h-210">
           {urlImage ? (
-            <img
-              src={urlImage}
-              className="rounded-md"
-              alt="image-preview-generate-ia"
-            />
+            <ZoomImage src={urlImage} />
           ) : (
             <span className="">No Image Preview</span>
           )}

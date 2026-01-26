@@ -1,5 +1,6 @@
 "use client";
 import ModalImage from "@/ui/components/ModalImage";
+import ModalMessage from "@/ui/components/ModalMessage";
 import PreviewDetail from "@/ui/components/PreviewDetail";
 import PreviewIA from "@/ui/components/PreviewIA";
 import Sidebar from "@/ui/components/Sidebar";
@@ -10,7 +11,17 @@ export interface IImage {
   name: string;
   logoUrl: string;
 }
+export interface IModalMessage {
+  open: boolean;
+  type: "error" | "success";
+  message: string;
+}
 
+export const CURRENT_MODAL_MESSAGE: IModalMessage = {
+  open: false,
+  type: "success",
+  message: "",
+};
 export const CURRENT_IMAGE: IImage = {
   url: "",
   name: "",
@@ -22,6 +33,9 @@ export default function Home() {
   const [openModalPreviewIA, setOpenModalPreviewIA] = useState<boolean>(false);
   const [imageEnhanced, setImageEnhanced] = useState<string>("");
   const [images, setImages] = useState<IImage[]>([]);
+  const [openModalMessage, setOpenModalMessage] = useState<IModalMessage>(
+    CURRENT_MODAL_MESSAGE,
+  );
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="grid grid-cols-[400px_auto_300px] h-full w-full realtive">
@@ -44,11 +58,18 @@ export default function Home() {
           urlImage={urlImage}
           setImages={setImages}
           images={images}
+          setOpenModalMessage={setOpenModalMessage}
         />
         {openModalPreviewIA && (
           <ModalImage
             urlImage={imageEnhanced}
             setOpenModalPreviewIA={setOpenModalPreviewIA}
+          />
+        )}
+        {openModalMessage.open && (
+          <ModalMessage
+            openModalMessage={openModalMessage}
+            setOpenModalMessage={setOpenModalMessage}
           />
         )}
       </main>
