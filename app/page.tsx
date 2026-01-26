@@ -41,7 +41,7 @@ export default function Home() {
     CURRENT_IMAGES[0],
   );
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
+    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans">
       <main className="grid grid-cols-[400px_auto_300px] h-full w-full realtive">
         <Sidebar
           urlImage={urlImage}
