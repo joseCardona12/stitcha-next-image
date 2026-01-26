@@ -3,7 +3,7 @@ import * as fabric from "fabric";
 import { AlertTriangle, Eye } from "lucide-react";
 import { loadImage } from "@/utils/loadImage";
 import { CURRENT_IMAGE, IImage } from "@/app/page";
-import { CURRENT_IMAGES } from "@/utils/constants/images";
+import { CURRENT_IMAGES, IImageLocalMockup } from "@/utils/constants/images";
 
 interface IPreviewDetailProps {
   urlImage: string;
@@ -12,6 +12,7 @@ interface IPreviewDetailProps {
   images: IImage[];
   setOpenModalPreviewIA: (value: boolean) => void;
   setImageEnhanced: (value: string) => void;
+  mockupSelected: IImageLocalMockup;
 }
 
 export default function PreviewDetail({
@@ -20,8 +21,10 @@ export default function PreviewDetail({
   images,
   setImageEnhanced,
   setOpenModalPreviewIA,
+  mockupSelected,
 }: IPreviewDetailProps) {
   const [isOutOfBounds, setIsOutOfBounds] = useState<boolean>(false);
+
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const fabricRef = useRef<fabric.Canvas | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -53,9 +56,9 @@ export default function PreviewDetail({
 
     try {
       const [shirtImage, shadowMask, maskImage] = await Promise.all([
-        loadImage(CURRENT_IMAGES.heavy_hoddie.base),
-        loadImage(CURRENT_IMAGES.heavy_hoddie.shadow),
-        loadImage(CURRENT_IMAGES.heavy_hoddie.mask),
+        loadImage(mockupSelected.base),
+        loadImage(mockupSelected.shadow),
+        loadImage(mockupSelected.mask),
       ]);
 
       // Calculamos el tamaño basado en el contenedor real para que ocupe el máximo espacio posible
@@ -164,7 +167,7 @@ export default function PreviewDetail({
       window.removeEventListener("resize", initEditor);
       fabricRef.current?.dispose();
     };
-  }, [urlImage]);
+  }, [urlImage, mockupSelected]);
 
   return (
     <div className="relative w-full h-screen flex flex-col overflow-hidden">

@@ -4,6 +4,7 @@ import ModalMessage from "@/ui/components/ModalMessage";
 import PreviewDetail from "@/ui/components/PreviewDetail";
 import PreviewIA from "@/ui/components/PreviewIA";
 import Sidebar from "@/ui/components/Sidebar";
+import { CURRENT_IMAGES, IImageLocalMockup } from "@/utils/constants/images";
 import { useState } from "react";
 
 export interface IImage {
@@ -36,10 +37,17 @@ export default function Home() {
   const [openModalMessage, setOpenModalMessage] = useState<IModalMessage>(
     CURRENT_MODAL_MESSAGE,
   );
+  const [mockupSelected, setMockupSelected] = useState<IImageLocalMockup>(
+    CURRENT_IMAGES[0],
+  );
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="grid grid-cols-[400px_auto_300px] h-full w-full realtive">
-        <Sidebar urlImage={urlImage} setUrlImage={setUrlImage} />
+        <Sidebar
+          urlImage={urlImage}
+          setUrlImage={setUrlImage}
+          setMockupSelected={setMockupSelected}
+        />
         <section className="">
           <PreviewDetail
             setUrlImage={setUrlImage}
@@ -48,6 +56,7 @@ export default function Home() {
             images={images}
             setOpenModalPreviewIA={setOpenModalPreviewIA}
             setImageEnhanced={setImageEnhanced}
+            mockupSelected={mockupSelected}
           />
         </section>
         <PreviewIA

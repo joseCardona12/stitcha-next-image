@@ -2,12 +2,18 @@ import { UploadIcon } from "lucide-react";
 import { useRef, useState } from "react";
 import Card from "./Card";
 import { FILES_SUPPORTED, MAXIMUN_SIZE } from "@/utils/constants/constants";
+import { CURRENT_IMAGES, IImageLocalMockup } from "@/utils/constants/images";
 
 interface ISidebarProps {
   urlImage: string;
   setUrlImage: (value: string) => void;
+  setMockupSelected: (value: IImageLocalMockup) => void;
 }
-export default function Sidebar({ urlImage, setUrlImage }: ISidebarProps) {
+export default function Sidebar({
+  urlImage,
+  setUrlImage,
+  setMockupSelected,
+}: ISidebarProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const handleClick = () => {
     inputRef.current?.click();
@@ -93,6 +99,17 @@ export default function Sidebar({ urlImage, setUrlImage }: ISidebarProps) {
           </div>
         </Card>
       )}
+      <div className="shadow-md w-full p-4 rounded-md flex flex-wrap gap-2">
+        {CURRENT_IMAGES.map((image: IImageLocalMockup, index: number) => (
+          <div
+            className="w-30 h-30 shadow-md rounded-md cursor-pointer hover:bg-gray-100 transition-colors duration-150"
+            key={index}
+            onClick={() => setMockupSelected(CURRENT_IMAGES[index])}
+          >
+            <img src={image.base} className="w-full h-full object-contain" />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
