@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import * as fabric from "fabric";
 import { AlertTriangle, Eye } from "lucide-react";
 import { loadImage } from "@/utils/loadImage";
-import { IImage } from "@/app/page";
+import { CURRENT_IMAGE, IImage } from "@/app/page";
+import { CURRENT_IMAGES } from "@/utils/constants/images";
 
 interface IPreviewDetailProps {
   urlImage: string;
@@ -52,9 +53,9 @@ export default function PreviewDetail({
 
     try {
       const [shirtImage, shadowMask, maskImage] = await Promise.all([
-        loadImage("/images/heavy-hoodie.png"),
-        loadImage("/images/heavy-hoodie-shadow.png"),
-        loadImage("/images/heavy-hoodie-mask.png"),
+        loadImage(CURRENT_IMAGES.heavy_hoddie.base),
+        loadImage(CURRENT_IMAGES.heavy_hoddie.shadow),
+        loadImage(CURRENT_IMAGES.heavy_hoddie.mask),
       ]);
 
       // Calculamos el tamaño basado en el contenedor real para que ocupe el máximo espacio posible

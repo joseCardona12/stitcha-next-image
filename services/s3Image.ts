@@ -17,7 +17,6 @@ export class S3ImageService {
       }
       return await response.json();
     } catch (error) {
-      console.log("error", error);
       throw new Error(`${error}`);
     }
   }
