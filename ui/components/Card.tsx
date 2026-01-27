@@ -12,7 +12,7 @@ export default function Card({
 }: ICardProps) {
   return (
     <div
-      className={`shadow-xs ${padding ? "p-4" : ""} rounded-md gap-2 ${className}`}
+      className={`shadow-xs rounded-md gap-2 transition-all duration-150 hover:shadow-sm ${padding ? "p-2 sm:p-3 lg:p-4" : "p-0"} ${className}`}
       onClick={onClick}
     >
       {children}

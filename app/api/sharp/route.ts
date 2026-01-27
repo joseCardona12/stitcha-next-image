@@ -62,7 +62,8 @@ export async function POST(req: Request) {
       .composite([
         {
           input: logoWithRelief,
-          // Ajuste de coordenadas centrado (como en tu código original)
+          // coords.left y coords.top ya son coordenadas del centro (originX/Y: center)
+          // restar la mitad del ancho/alto para obtener la esquina superior izquierda
           top: Math.round(coords.top - coords.height / 2),
           left: Math.round(coords.left - coords.width / 2),
         },
