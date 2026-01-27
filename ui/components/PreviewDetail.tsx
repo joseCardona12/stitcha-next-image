@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import * as fabric from "fabric";
-import { AlertTriangle, Eye } from "lucide-react";
 import { loadImage } from "@/utils/loadImage";
 import { CURRENT_IMAGE, IImage, IModalPreview } from "@/app/page";
 import { CURRENT_IMAGES, IImageLocalMockup } from "@/utils/constants/images";
@@ -35,6 +34,7 @@ export default function PreviewDetail({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const isInitializing = useRef(false);
   const maskCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const scaleRatioRef = useRef(1);
   const [origDimensions, setOrigDimensions] = useState({ with: 0, height: 0 });
   const [loadingPreview, setLoadingPreview] = useState<boolean>(false);
 
@@ -76,6 +76,9 @@ export default function PreviewDetail({
         contW,
         contH,
       );
+
+      // Guardar el factor de escala para calcular coordenadas originales
+      scaleRatioRef.current = scale;
 
       // Sincronizar máscara de colisión
       if (!maskCanvasRef.current)
@@ -153,7 +156,7 @@ export default function PreviewDetail({
   const previewGenerate = async () => {
     setLoadingPreview(true);
     const canvas = fabricRef.current;
-    if (!canvas || !origDimensions.with) {
+    if (!canvas) {
       setLoadingPreview(false);
       return;
     }
@@ -165,7 +168,10 @@ export default function PreviewDetail({
       return;
     }
 
-    const ratio = origDimensions.with / canvas.getWidth();
+    // El ratio es simple: 1 / scale
+    // Las coordenadas en el canvas están escaladas, divido por el factor de escala
+    const ratio = 1 / scaleRatioRef.current;
+
     const logoDataURL = logoObject.toDataURL({
       format: "png",
       quality: 1,
@@ -204,21 +210,17 @@ export default function PreviewDetail({
   }, [urlImage, mockupSelected]);
 
   return (
-    <div className="relative w-full h-screen flex flex-col overflow-hidden bg-white">
-      <div className="absolute top-0 left-0 w-full z-50 pointer-events-none p-6 bg-white">
-        <div className="flex justify-between items-center pointer-events-auto">
-          <div className="">
-            <p className="text-[10px] font-black uppercase text-blue-600 tracking-widest">
-              Real-Time integration
+    <div className="w-full h-full flex flex-col bg-white overflow-hidden">
+      <div className="shrink-0 z-40 pointer-events-none p-2 sm:p-3 lg:p-5 bg-white border-b border-gray-200">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 sm:gap-4 pointer-events-auto flex-wrap">
+          <div>
+            <p className="text-[7px] sm:text-[10px] font-black uppercase text-blue-600 tracking-widest">
+              Real-Time Editor
             </p>
-            <p className="text-sm font-bold text-zinc-900">Hoodie Mockup v2</p>
+            <p className="text-xs sm:text-sm font-bold text-zinc-900">
+              Design Your Mockup
+            </p>
           </div>
-
-          {isOutOfBounds && (
-            <div className="flex items-center gap-2 bg-amber-500 text-white px-4 py-2 rounded-full shadow-lg font-bold text-xs">
-              <AlertTriangle size={16} /> LOGO FUERA DE ÁREA
-            </div>
-          )}
 
           <Button
             disabled={loadingPreview}
@@ -226,16 +228,16 @@ export default function PreviewDetail({
               previewGenerate();
             }}
           >
-            {loadingPreview ? "Loading" : "Preview Image"}
+            {loadingPreview ? "Loading..." : "Generate"}
           </Button>
         </div>
       </div>
 
       <div
         ref={containerRef}
-        className="flex-1 flex items-center justify-center p-12"
+        className="flex-1 flex items-center justify-center p-1 sm:p-2 lg:p-6 overflow-auto bg-gray-50 min-h-0"
       >
-        <div className="relative overflow-hidden">
+        <div className="relative flex items-center justify-center w-full h-full">
           <canvas ref={canvasRef}></canvas>
         </div>
       </div>

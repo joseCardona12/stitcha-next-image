@@ -68,9 +68,9 @@ export default function Sidebar({
     reader.readAsDataURL(file as File);
   };
   return (
-    <div className="border-r border-gray-200 p-6 flex flex-col gap-2 bg-gray-50">
+    <div className="border-b lg:border-b-0 lg:border-r border-gray-200 p-3 sm:p-4 lg:p-4 flex flex-col gap-2 bg-gray-50">
       <Card
-        className="flex flex-col justify-center items-center bg-white cursor-pointer"
+        className="flex flex-col justify-center items-center bg-white cursor-pointer p-3"
         onClick={() => handleClick()}
       >
         <input
@@ -83,14 +83,14 @@ export default function Sidebar({
         <button className="border border-gray-100 p-1 rounded-full cursor-pointer">
           <UploadIcon className="w-4 h-4 text-gray-500" />
         </button>
-        <p className="text-sm text-gray-700">Upload image</p>
+        <p className="text-xs text-gray-700">Upload</p>
       </Card>
       {urlImage && (
-        <Card className="bg-white">
-          <div className="flex justify-start">
-            <span className="text-sm text-gray-500">Artwork Preview</span>
+        <Card className="bg-white p-2">
+          <div className="flex justify-start mb-1">
+            <span className="text-xs text-gray-500">Artwork</span>
           </div>
-          <div className="w-20 h-20">
+          <div className="w-16 h-16">
             <img
               className="w-full h-full object-contain"
               src={urlImage}
@@ -99,10 +99,10 @@ export default function Sidebar({
           </div>
         </Card>
       )}
-      <Card className="flex flex-wrap bg-white">
+      <Card className="flex flex-wrap gap-2 bg-white p-2">
         {CURRENT_IMAGES.map((image: IImageLocalMockup, index: number) => (
           <div
-            className="w-30 h-30 shadow-xs rounded-md cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors duration-150"
+            className="w-20 h-20 sm:w-24 sm:h-24 shadow-xs rounded-md cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors duration-150 shrink-0"
             key={index}
             onClick={() => setMockupSelected(CURRENT_IMAGES[index])}
           >
