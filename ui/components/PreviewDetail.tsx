@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as fabric from "fabric";
 import { loadImage } from "@/utils/loadImage";
+import { renderMaskedLogo } from "@/utils/renderMaskedLogo";
 import { CURRENT_IMAGE, IImage, IModalPreview } from "@/app/page";
 import { CURRENT_IMAGES, IImageLocalMockup } from "@/utils/constants/images";
 import Button from "./Button";
@@ -45,7 +46,7 @@ export default function PreviewDetail({
     });
     if (!maskCtx) return true;
 
-    // Obtener centro relativo al canvas
+    // Get center relative to canvas
     const center = logoObj.getCenterPoint();
     const imageData = maskCtx.getImageData(center.x, center.y, 1, 1);
     return imageData.data[0] > 128;
@@ -77,10 +78,10 @@ export default function PreviewDetail({
         contH,
       );
 
-      // Guardar el factor de escala para calcular coordenadas originales
+      // Save scale factor to calculate original coordinates
       scaleRatioRef.current = scale;
 
-      // Sincronizar máscara de colisión
+      // Synchronize collision mask
       if (!maskCanvasRef.current)
         maskCanvasRef.current = document.createElement("canvas");
       maskCanvasRef.current.width = canvasWidth;
@@ -97,7 +98,7 @@ export default function PreviewDetail({
       });
       fabricRef.current = canvas;
 
-      // 1. CAPA BASE (CENTRADA)
+      // 1. BASE LAYER (CENTERED)
       const fabricBase = new fabric.Image(shirtImage, {
         selectable: false,
         evented: false,
@@ -111,7 +112,7 @@ export default function PreviewDetail({
       canvas.add(fabricBase);
 
       // 2. CLIP PATH
-      const visualClip = new fabric.Image(maskImage, {
+      const visualClip = new fabric.Image(shirtImage, {
         scaleX: scale,
         scaleY: scale,
         originX: "center",
@@ -121,7 +122,7 @@ export default function PreviewDetail({
         absolutePositioned: true,
       });
 
-      // 3. LOGO (AL CENTRO INICIAL)
+      // 3. LOGO (AT INITIAL CENTER)
       if (urlImage) {
         const logoImg = await fabric.Image.fromURL(urlImage, {
           crossOrigin: "anonymous",
@@ -163,38 +164,57 @@ export default function PreviewDetail({
     const logoObject = canvas
       .getObjects()
       .find((obj) => obj.selectable) as fabric.Image;
-    if (!logoObject) {
+    if (!logoObject || !maskCanvasRef.current) {
       setLoadingPreview(false);
       return;
     }
 
-    // El ratio es simple: 1 / scale
-    // Las coordenadas en el canvas están escaladas, divido por el factor de escala
     const ratio = 1 / scaleRatioRef.current;
-
-    const logoDataURL = logoObject.toDataURL({
-      format: "png",
-      quality: 1,
-    });
-
-    const renderData: IGeneratePreviewSharpRequest = {
-      mockupId: mockupSelected.id,
-      logoData: logoDataURL,
-      coords: {
-        left: Math.round(logoObject.left * ratio),
-        top: Math.round(logoObject.top * ratio),
-        width: Math.round(logoObject.getScaledWidth() * ratio),
-        height: Math.round(logoObject.getScaledHeight() * ratio),
-        angle: logoObject.angle || 0,
-      },
-    };
+    const logoWidth = logoObject.getScaledWidth();
+    const logoHeight = logoObject.getScaledHeight();
 
     try {
+      // Get the logo image without mask
+      const originalClipPath = logoObject.clipPath;
+      logoObject.clipPath = undefined;
+      const logoDataURL = logoObject.toDataURL({
+        format: "png",
+        quality: 1,
+      });
+      logoObject.clipPath = originalClipPath;
+
+      // Render logo with mask applied
+      const maskedLogoResult = await renderMaskedLogo({
+        logoDataURL,
+        logoWidth,
+        logoHeight,
+        logoAngle: logoObject.angle,
+        maskCanvas: maskCanvasRef.current,
+        logoPositionLeft: logoObject.left,
+        logoPositionTop: logoObject.top,
+      });
+
+      if (!maskedLogoResult.success) {
+        throw new Error("Failed to render masked logo");
+      }
+
+      const renderData: IGeneratePreviewSharpRequest = {
+        mockupId: mockupSelected.id,
+        logoData: maskedLogoResult.croppedLogoDataURL,
+        coords: {
+          left: Math.round(logoObject.left * ratio),
+          top: Math.round(logoObject.top * ratio),
+          width: Math.round(logoWidth * ratio),
+          height: Math.round(logoHeight * ratio),
+          angle: logoObject.angle || 0,
+        },
+      };
+
       const result = await sharpService.generatePreviewSharp(renderData);
       setPreviewSharp(result?.data?.url ?? "");
       setImageBase64(fabricRef.current?.toDataURL({ multiplier: 2 }) || "");
     } catch (error) {
-      console.log("ERROR: ", error);
+      console.log("ERROR in previewGenerate:", error);
     } finally {
       setLoadingPreview(false);
     }
