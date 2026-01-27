@@ -14,7 +14,7 @@ export default function ModalMessage({
   return (
     <div className={`absolute top-2 right-2`}>
       <div
-        className={`relative rounded-md p-2 pl-4 pr-4 ${openModalMessage.type === "success" ? "bg-green-50" : "bg-red-300"} flex flex-col gap-2 shadow-sm`}
+        className={`relative rounded-md p-2 pl-4 pr-4 ${openModalMessage.type === "success" ? "bg-green-300" : "bg-red-300"} flex flex-col gap-2 shadow-sm`}
         onMouseEnter={() => setShowButtonClose(true)}
         onMouseLeave={() => setShowButtonClose(false)}
       >
