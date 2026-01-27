@@ -2,17 +2,21 @@ import { useEffect, useRef, useState } from "react";
 import * as fabric from "fabric";
 import { AlertTriangle, Eye } from "lucide-react";
 import { loadImage } from "@/utils/loadImage";
-import { CURRENT_IMAGE, IImage } from "@/app/page";
+import { CURRENT_IMAGE, IImage, IModalPreview } from "@/app/page";
 import { CURRENT_IMAGES, IImageLocalMockup } from "@/utils/constants/images";
+import Button from "./Button";
+import adjustScale from "@/utils/adjustScale";
+import { IGeneratePreviewSharpRequest, sharpService } from "@/services/sharp";
 
 interface IPreviewDetailProps {
   urlImage: string;
   setUrlImage: (value: string) => void;
   setImageBase64: (value: string) => void;
   images: IImage[];
-  setOpenModalPreviewIA: (value: boolean) => void;
+  setOpenModalPreviewIA: (value: IModalPreview) => void;
   setImageEnhanced: (value: string) => void;
   mockupSelected: IImageLocalMockup;
+  setPreviewSharp: (value: string) => void;
 }
 
 export default function PreviewDetail({
@@ -22,6 +26,7 @@ export default function PreviewDetail({
   setImageEnhanced,
   setOpenModalPreviewIA,
   mockupSelected,
+  setPreviewSharp,
 }: IPreviewDetailProps) {
   const [isOutOfBounds, setIsOutOfBounds] = useState<boolean>(false);
 
@@ -30,6 +35,8 @@ export default function PreviewDetail({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const isInitializing = useRef(false);
   const maskCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [origDimensions, setOrigDimensions] = useState({ with: 0, height: 0 });
+  const [loadingPreview, setLoadingPreview] = useState<boolean>(false);
 
   const checkLogoInMask = async (logoObj: fabric.Image): Promise<boolean> => {
     if (!maskCanvasRef.current || !fabricRef.current) return true;
@@ -55,21 +62,20 @@ export default function PreviewDetail({
     }
 
     try {
-      const [shirtImage, shadowMask, maskImage] = await Promise.all([
+      const [shirtImage, maskImage] = await Promise.all([
         loadImage(mockupSelected.base),
-        loadImage(mockupSelected.shadow),
         loadImage(mockupSelected.mask),
       ]);
-
-      // Calculamos el tamaño basado en el contenedor real para que ocupe el máximo espacio posible
       const contW = containerRef.current.clientWidth;
       const contH = containerRef.current.clientHeight;
 
-      // Ajustar escala para que la imagen quepa perfectamente (contain)
-      const scale =
-        Math.min(contW / shirtImage.width, contH / shirtImage.height) * 0.9;
-      const canvasWidth = shirtImage.width * scale;
-      const canvasHeight = shirtImage.height * scale;
+      setOrigDimensions({ with: contW, height: contH });
+
+      const { scale, canvasHeight, canvasWidth } = adjustScale(
+        shirtImage,
+        contW,
+        contH,
+      );
 
       // Sincronizar máscara de colisión
       if (!maskCanvasRef.current)
@@ -136,27 +142,55 @@ export default function PreviewDetail({
         logoImg.set({ left: canvasWidth / 2, top: canvasHeight / 2 });
         canvas.setActiveObject(logoImg);
       }
-
-      // 4. CAPA SOMBRAS (MULTIPLY)
-      const shadowLayer = new fabric.Image(shadowMask, {
-        selectable: false,
-        evented: false,
-        scaleX: scale,
-        scaleY: scale,
-        originX: "center",
-        originY: "center",
-        left: canvasWidth / 2,
-        top: canvasHeight / 2,
-        globalCompositeOperation: "multiply",
-        opacity: 0.8,
-      });
-      canvas.add(shadowLayer);
-
       canvas.renderAll();
     } catch (err) {
       console.error(err);
     } finally {
       isInitializing.current = false;
+    }
+  };
+
+  const previewGenerate = async () => {
+    setLoadingPreview(true);
+    const canvas = fabricRef.current;
+    if (!canvas || !origDimensions.with) {
+      setLoadingPreview(false);
+      return;
+    }
+    const logoObject = canvas
+      .getObjects()
+      .find((obj) => obj.selectable) as fabric.Image;
+    if (!logoObject) {
+      setLoadingPreview(false);
+      return;
+    }
+
+    const ratio = origDimensions.with / canvas.getWidth();
+    const logoDataURL = logoObject.toDataURL({
+      format: "png",
+      quality: 1,
+    });
+
+    const renderData: IGeneratePreviewSharpRequest = {
+      mockupId: mockupSelected.id,
+      logoData: logoDataURL,
+      coords: {
+        left: Math.round(logoObject.left * ratio),
+        top: Math.round(logoObject.top * ratio),
+        width: Math.round(logoObject.getScaledWidth() * ratio),
+        height: Math.round(logoObject.getScaledHeight() * ratio),
+        angle: logoObject.angle || 0,
+      },
+    };
+
+    try {
+      const result = await sharpService.generatePreviewSharp(renderData);
+      setPreviewSharp(result?.data?.url ?? "");
+      setImageBase64(fabricRef.current?.toDataURL({ multiplier: 2 }) || "");
+    } catch (error) {
+      console.log("ERROR: ", error);
+    } finally {
+      setLoadingPreview(false);
     }
   };
 
@@ -170,7 +204,7 @@ export default function PreviewDetail({
   }, [urlImage, mockupSelected]);
 
   return (
-    <div className="relative w-full h-screen flex flex-col overflow-hidden">
+    <div className="relative w-full h-screen flex flex-col overflow-hidden bg-white">
       <div className="absolute top-0 left-0 w-full z-50 pointer-events-none p-6 bg-white">
         <div className="flex justify-between items-center pointer-events-auto">
           <div className="">
@@ -186,16 +220,14 @@ export default function PreviewDetail({
             </div>
           )}
 
-          <button
-            onClick={() =>
-              setImageBase64(
-                fabricRef.current?.toDataURL({ multiplier: 2 }) || "",
-              )
-            }
-            className="border border-gray-200 rounded-xl pl-4 pr-4 p-2 cursor-pointer hover:bg-gray-100 transition-colors duration-150"
+          <Button
+            disabled={loadingPreview}
+            onClick={() => {
+              previewGenerate();
+            }}
           >
-            Preview Image
-          </button>
+            {loadingPreview ? "Loading" : "Preview Image"}
+          </Button>
         </div>
       </div>
 

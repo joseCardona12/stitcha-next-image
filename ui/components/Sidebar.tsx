@@ -68,8 +68,11 @@ export default function Sidebar({
     reader.readAsDataURL(file as File);
   };
   return (
-    <div className="border-r border-gray-200 p-6 flex flex-col gap-2">
-      <Card className="flex flex-col justify-center items-center">
+    <div className="border-r border-gray-200 p-6 flex flex-col gap-2 bg-gray-50">
+      <Card
+        className="flex flex-col justify-center items-center bg-white cursor-pointer"
+        onClick={() => handleClick()}
+      >
         <input
           ref={inputRef}
           type="file"
@@ -77,16 +80,13 @@ export default function Sidebar({
           className="hidden"
           onChange={handleChange}
         />
-        <button
-          onClick={handleClick}
-          className="border border-gray-100 p-1 rounded-full cursor-pointer"
-        >
+        <button className="border border-gray-100 p-1 rounded-full cursor-pointer">
           <UploadIcon className="w-4 h-4 text-gray-500" />
         </button>
         <p className="text-sm text-gray-700">Upload image</p>
       </Card>
       {urlImage && (
-        <Card className="">
+        <Card className="bg-white">
           <div className="flex justify-start">
             <span className="text-sm text-gray-500">Artwork Preview</span>
           </div>
@@ -99,17 +99,17 @@ export default function Sidebar({
           </div>
         </Card>
       )}
-      <div className="shadow-md w-full p-4 rounded-md flex flex-wrap gap-2">
+      <Card className="flex flex-wrap bg-white">
         {CURRENT_IMAGES.map((image: IImageLocalMockup, index: number) => (
           <div
-            className="w-30 h-30 shadow-md rounded-md cursor-pointer hover:bg-gray-100 transition-colors duration-150"
+            className="w-30 h-30 shadow-xs rounded-md cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors duration-150"
             key={index}
             onClick={() => setMockupSelected(CURRENT_IMAGES[index])}
           >
             <img src={image.base} className="w-full h-full object-contain" />
           </div>
         ))}
-      </div>
+      </Card>
     </div>
   );
 }

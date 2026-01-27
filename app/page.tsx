@@ -18,11 +18,23 @@ export interface IModalMessage {
   message: string;
 }
 
+export interface IModalPreview {
+  state: boolean;
+  url: string;
+  title: string;
+}
+
+export const CURRENT_MODAL_PREVIEW: IModalPreview = {
+  state: false,
+  url: "",
+  title: "",
+};
 export const CURRENT_MODAL_MESSAGE: IModalMessage = {
   open: false,
   type: "success",
   message: "",
 };
+
 export const CURRENT_IMAGE: IImage = {
   url: "",
   name: "",
@@ -31,7 +43,9 @@ export const CURRENT_IMAGE: IImage = {
 export default function Home() {
   const [urlImage, setUrlImage] = useState<string>("");
   const [imageBase64, setImageBase64] = useState<string>("");
-  const [openModalPreviewIA, setOpenModalPreviewIA] = useState<boolean>(false);
+  const [openModalPreviewIA, setOpenModalPreviewIA] = useState<IModalPreview>(
+    CURRENT_MODAL_PREVIEW,
+  );
   const [imageEnhanced, setImageEnhanced] = useState<string>("");
   const [images, setImages] = useState<IImage[]>([]);
   const [openModalMessage, setOpenModalMessage] = useState<IModalMessage>(
@@ -40,8 +54,9 @@ export default function Home() {
   const [mockupSelected, setMockupSelected] = useState<IImageLocalMockup>(
     CURRENT_IMAGES[0],
   );
+  const [previewSharp, setPreviewSharp] = useState<string>("");
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans">
+    <div className="flex min-h-screen items-center justify-center bg-white font-sans">
       <main className="grid grid-cols-[400px_auto_300px] h-full w-full realtive">
         <Sidebar
           urlImage={urlImage}
@@ -57,6 +72,7 @@ export default function Home() {
             setOpenModalPreviewIA={setOpenModalPreviewIA}
             setImageEnhanced={setImageEnhanced}
             mockupSelected={mockupSelected}
+            setPreviewSharp={setPreviewSharp}
           />
         </section>
         <PreviewIA
@@ -68,11 +84,13 @@ export default function Home() {
           setImages={setImages}
           images={images}
           setOpenModalMessage={setOpenModalMessage}
+          previewSharp={previewSharp}
         />
-        {openModalPreviewIA && (
+        {openModalPreviewIA.state && (
           <ModalImage
-            urlImage={imageEnhanced}
+            urlImage={openModalPreviewIA.url}
             setOpenModalPreviewIA={setOpenModalPreviewIA}
+            openModalPreviewIA={openModalPreviewIA}
           />
         )}
         {openModalMessage.open && (
