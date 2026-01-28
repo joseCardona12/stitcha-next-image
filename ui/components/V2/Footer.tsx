@@ -159,19 +159,21 @@ export default function Footer({
           <ChevronLeft className="w-4 h-4" />
           Back
         </Button>
-        <Button
-          onClick={handleContinue}
-          disabled={loadingGenerate}
-          variant={imageBaseSelect.base ? "black" : "default"}
-          className="flex items-center gap-2"
-        >
-          {is_edit_generate ? "Generate image" : "Continuar"}
-          {is_edit_generate && loadingGenerate ? (
-            <Loader className="w-4 h-4 animate-spin" />
-          ) : (
-            <ChevronRight className="w-4 h-4" />
-          )}
-        </Button>
+        {tab.tab !== "generate-image" && (
+          <Button
+            onClick={handleContinue}
+            disabled={loadingGenerate}
+            variant={imageBaseSelect.base ? "black" : "default"}
+            className="flex items-center gap-2"
+          >
+            {is_edit_generate ? "Generate image" : "Continue"}
+            {is_edit_generate && loadingGenerate ? (
+              <Loader className="w-4 h-4 animate-spin" />
+            ) : (
+              <ChevronRight className="w-4 h-4" />
+            )}
+          </Button>
+        )}
       </div>
     </footer>
   );

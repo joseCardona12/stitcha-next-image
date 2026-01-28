@@ -134,8 +134,8 @@ export default function Edit({
   return (
     <div className="w-300 h-full overflow-hidden flex flex-col gap-6 relative">
       <TitleDescription
-        title="Editar image"
-        description="Edita el logo para generar la imagen."
+        title="Edit Image"
+        description="Edit the logo to generate image."
       />
       <div className="absolute top-0 right-0">
         <Button
@@ -149,7 +149,7 @@ export default function Edit({
           disabled={false}
         >
           <ChevronLeft />
-          Volver al Inicio
+          Go to Home
         </Button>
       </div>
       <div
