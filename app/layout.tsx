@@ -29,9 +29,9 @@ export default function RootLayout({
         <meta name="theme-color" content="#ffffff" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-hidden m-0 p-0`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased m-0 p-0 flex flex-col min-h-screen`}
       >
-        {children}
+        <div className="flex-1">{children}</div>
       </body>
     </html>
   );

@@ -4,7 +4,7 @@ export default function adjustScale(
   contH: number,
 ) {
   const scale =
-    Math.min(contW / shirtImage.width, contH / shirtImage.height) * 0.9;
+    Math.min(contW / shirtImage.width, contH / shirtImage.height) * 1.2;
   const canvasWidth = shirtImage.width * scale;
   const canvasHeight = shirtImage.height * scale;
   return {

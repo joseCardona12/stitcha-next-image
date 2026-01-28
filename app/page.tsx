@@ -1,195 +1,119 @@
 "use client";
-import ModalImage from "@/ui/components/ModalImage";
-import ModalMessage from "@/ui/components/ModalMessage";
-import PreviewDetail from "@/ui/components/PreviewDetail";
-import PreviewIA from "@/ui/components/PreviewIA";
-import Sidebar from "@/ui/components/Sidebar";
-import { CURRENT_IMAGES, IImageLocalMockup } from "@/utils/constants/images";
-import { useEffect, useState } from "react";
 
-export interface IImage {
-  url: string;
+import Edit from "@/ui/components/V2/Edit";
+import Footer from "@/ui/components/V2/Footer";
+import GenerateImage from "@/ui/components/V2/GenerateImage";
+import Header from "@/ui/components/V2/Header";
+import Separador from "@/ui/components/V2/Separador";
+import UploadFile from "@/ui/components/V2/UploadFile";
+import ViewSelection from "@/ui/components/V2/ViewSelection";
+import {
+  CURRENT_IMAGE_LOCAL_MOCKUP,
+  IImageLocalMockup,
+} from "@/utils/constants/images";
+import { useRef, useState } from "react";
+import * as fabric from "fabric";
+import GenerateSharp from "@/ui/components/V2/GenerateSharp";
+
+export interface ITab {
+  tab: string;
+}
+export const CURRENT_TAB: ITab = {
+  tab: "selection",
+};
+
+export interface IUrlImage {
+  urlLogo: string;
   name: string;
-  logoUrl: string;
+  size: string;
 }
+
 export interface IModalMessage {
-  open: boolean;
-  type: "error" | "success";
   message: string;
+  open: boolean;
+  type: "success" | "error" | "";
 }
 
-export interface IModalPreview {
-  state: boolean;
-  url: string;
-  title: string;
-}
-
-export const CURRENT_MODAL_PREVIEW: IModalPreview = {
-  state: false,
-  url: "",
-  title: "",
-};
 export const CURRENT_MODAL_MESSAGE: IModalMessage = {
-  open: false,
-  type: "success",
   message: "",
+  open: false,
+  type: "",
 };
 
-export const CURRENT_IMAGE: IImage = {
-  url: "",
+export const CURRENT_URL_IMAGE: IUrlImage = {
+  urlLogo: "",
   name: "",
-  logoUrl: "",
+  size: "",
 };
 export default function Home() {
-  const [urlImage, setUrlImage] = useState<string>("");
-  const [imageBase64, setImageBase64] = useState<string>("");
-  const [openModalPreviewIA, setOpenModalPreviewIA] = useState<IModalPreview>(
-    CURRENT_MODAL_PREVIEW,
+  const [imageBaseSelect, setImageBaseSelect] = useState<IImageLocalMockup>(
+    CURRENT_IMAGE_LOCAL_MOCKUP,
   );
-  const [imageEnhanced, setImageEnhanced] = useState<string>("");
-  const [images, setImages] = useState<IImage[]>([]);
+  const [urlImage, setUrlImage] = useState<IUrlImage>(CURRENT_URL_IMAGE);
+  const [tab, setTab] = useState<ITab>(CURRENT_TAB);
+  const [previewSharp, setPreviewSharp] = useState<string>("");
   const [openModalMessage, setOpenModalMessage] = useState<IModalMessage>(
     CURRENT_MODAL_MESSAGE,
   );
-  const [mockupSelected, setMockupSelected] = useState<IImageLocalMockup>(
-    CURRENT_IMAGES[0],
-  );
-  const [previewSharp, setPreviewSharp] = useState<string>("");
-  const [mobileTab, setMobileTab] = useState<"editor" | "mockups" | "preview">(
-    "editor",
-  );
+  const [imageOpenAI, setImageOpenAI] = useState<string>("");
 
-  // Automáticamente ir a editor cuando se sube un logo
-  useEffect(() => {
-    if (urlImage) {
-      setMobileTab("editor");
-    }
-  }, [urlImage]);
-
-  // Automáticamente ir a preview cuando se genera el resultado
-  useEffect(() => {
-    if (previewSharp) {
-      setMobileTab("preview");
-    }
-  }, [previewSharp]);
+  const fabricRef = useRef<fabric.Canvas | null>(null);
+  const maskCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const scaleRatioRef = useRef(1);
 
   return (
-    <div className="flex flex-col h-screen w-screen bg-white font-sans overflow-hidden">
-      <main className="flex flex-col lg:flex-row flex-1 w-full gap-0 overflow-hidden">
-        {/* Sidebar - Hidden on mobile, visible on lg+ */}
-        <div className="hidden lg:block lg:w-auto lg:min-w-75 xl:min-w-100 border-r border-gray-200 overflow-y-auto">
-          <Sidebar
+    <div className="bg-white flex flex-col gap-4 w-full">
+      <Header setTab={setTab} tab={tab} />
+      <Separador />
+      <main className="max-w-300 m-auto h-[75vh] overflow-y-scroll">
+        {tab.tab === "selection" ? (
+          <ViewSelection
+            setImageBaseSelect={setImageBaseSelect}
+            imageBaseSelect={imageBaseSelect}
+          />
+        ) : tab.tab === "upload-file" ? (
+          <UploadFile setUrlImage={setUrlImage} urlImage={urlImage} />
+        ) : tab.tab === "edit" ? (
+          <Edit
             urlImage={urlImage}
-            setUrlImage={setUrlImage}
-            setMockupSelected={setMockupSelected}
+            imageBaseSelect={imageBaseSelect}
+            fabricRef={fabricRef}
+            maskCanvasRef={maskCanvasRef}
+            scaleRatioRef={scaleRatioRef}
+            setTab={setTab}
           />
-        </div>
-
-        {/* Main Editor Section */}
-        <section className="flex-1 border-b lg:border-b-0 lg:border-r border-gray-200 min-h-0 overflow-hidden">
-          {/* Always show on desktop (lg:block), conditionally show on mobile based on tab */}
-          <div
-            className={`h-full ${mobileTab === "editor" ? "block" : "hidden"} lg:block`}
-          >
-            <PreviewDetail
-              setUrlImage={setUrlImage}
-              urlImage={urlImage}
-              setImageBase64={setImageBase64}
-              images={images}
-              setOpenModalPreviewIA={setOpenModalPreviewIA}
-              setImageEnhanced={setImageEnhanced}
-              mockupSelected={mockupSelected}
-              setPreviewSharp={setPreviewSharp}
-            />
-          </div>
-          {mobileTab === "mockups" && (
-            <div className="lg:hidden h-full overflow-y-auto">
-              <Sidebar
-                urlImage={urlImage}
-                setUrlImage={setUrlImage}
-                setMockupSelected={setMockupSelected}
-              />
-            </div>
-          )}
-          {mobileTab === "preview" && (
-            <div className="lg:hidden h-full overflow-y-auto">
-              <PreviewIA
-                imageBase64={imageBase64}
-                setOpenModalPreviewIA={setOpenModalPreviewIA}
-                setImageEnhanced={setImageEnhanced}
-                imageEnhanced={imageEnhanced}
-                urlImage={urlImage}
-                setImages={setImages}
-                images={images}
-                setOpenModalMessage={setOpenModalMessage}
-                previewSharp={previewSharp}
-              />
-            </div>
-          )}
-        </section>
-
-        {/* Preview Panel - Hidden on mobile, visible on lg+ */}
-        <div className="hidden lg:block lg:w-auto lg:min-w-70 xl:min-w-75 min-h-0 overflow-y-auto">
-          <PreviewIA
-            imageBase64={imageBase64}
-            setOpenModalPreviewIA={setOpenModalPreviewIA}
-            setImageEnhanced={setImageEnhanced}
-            imageEnhanced={imageEnhanced}
-            urlImage={urlImage}
-            setImages={setImages}
-            images={images}
-            setOpenModalMessage={setOpenModalMessage}
-            previewSharp={previewSharp}
-          />
-        </div>
-        {openModalPreviewIA.state && (
-          <ModalImage
-            urlImage={openModalPreviewIA.url}
-            setOpenModalPreviewIA={setOpenModalPreviewIA}
-            openModalPreviewIA={openModalPreviewIA}
-          />
-        )}
-        {openModalMessage.open && (
-          <ModalMessage
+        ) : tab.tab === "generate-image" ? (
+          <GenerateImage
+            urlImageSharp={previewSharp}
             openModalMessage={openModalMessage}
             setOpenModalMessage={setOpenModalMessage}
+            setImageOpenAI={setImageOpenAI}
+            imageOpenAI={imageOpenAI}
+            imageBaseSelect={imageBaseSelect}
+            urlImageLogo={urlImage}
+            setTab={setTab}
+            setPreviewSharp={setPreviewSharp}
+            setUrlImage={setUrlImage}
           />
+        ) : tab.tab === "generate-sharp" ? (
+          <GenerateSharp urlImageSharp={previewSharp} setTab={setTab} />
+        ) : (
+          ""
         )}
       </main>
-
-      {/* Mobile Tab Navigation */}
-      <div className="lg:hidden flex border-t border-gray-200 bg-white">
-        <button
-          onClick={() => setMobileTab("mockups")}
-          className={`flex-1 py-3 px-4 text-xs sm:text-sm font-semibold transition-colors ${
-            mobileTab === "mockups"
-              ? "border-b-2 border-blue-600 text-blue-600"
-              : "text-gray-600 hover:text-gray-900"
-          }`}
-        >
-          Mockups
-        </button>
-        <button
-          onClick={() => setMobileTab("editor")}
-          className={`flex-1 py-3 px-4 text-xs sm:text-sm font-semibold transition-colors ${
-            mobileTab === "editor"
-              ? "border-b-2 border-blue-600 text-blue-600"
-              : "text-gray-600 hover:text-gray-900"
-          }`}
-        >
-          Editor
-        </button>
-        <button
-          onClick={() => setMobileTab("preview")}
-          className={`flex-1 py-3 px-4 text-xs sm:text-sm font-semibold transition-colors ${
-            mobileTab === "preview"
-              ? "border-b-2 border-blue-600 text-blue-600"
-              : "text-gray-600 hover:text-gray-900"
-          }`}
-        >
-          Preview
-        </button>
-      </div>
+      <Separador />
+      <Footer
+        imageBaseSelect={imageBaseSelect}
+        setTab={setTab}
+        tab={tab}
+        urlImage={urlImage}
+        fabricRef={fabricRef}
+        maskCanvasRef={maskCanvasRef}
+        scaleRatioRef={scaleRatioRef}
+        setPreviewSharp={setPreviewSharp}
+        setImageOpenAI={setImageOpenAI}
+        imageOpenAI={imageOpenAI}
+      />
     </div>
   );
 }
