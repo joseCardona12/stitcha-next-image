@@ -28,7 +28,7 @@ export default function GenerateSharp({
   };
   return (
     <div className="w-300 h-full flex flex-col gap-6 relative">
-      <TitleDescription title="Generar con Sharp" description="Renderizado." />
+      <TitleDescription title="Generate with Sharp" description="Rendering" />
       <div className="absolute top-0 right-0">
         <Button
           variant="default"
@@ -41,7 +41,7 @@ export default function GenerateSharp({
           disabled={false}
         >
           <ChevronLeft />
-          Volver al Inicio
+          Go to Home
         </Button>
       </div>
       <div className="border border-gray-200 rounded-xl w-full h-full flex justify-center items-center overflow-hidden relative">

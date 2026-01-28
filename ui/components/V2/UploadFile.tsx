@@ -61,8 +61,8 @@ export default function UploadFile({
   return (
     <div className="flex flex-col gap-6 w-300 h-full">
       <TitleDescription
-        title="Sube el Logo"
-        description="Sube un archivo para empezar el renderizado."
+        title="Upload file"
+        description="Upload a file to render start"
       />
       <input
         ref={inputRef}
@@ -82,7 +82,7 @@ export default function UploadFile({
             <div className="bg-green-200 w-18 h-18 rounded-full flex justify-center items-center">
               <Check className="text-green-600 w-8 h-8" />
             </div>
-            <h3 className="font-bold">Logo Subido</h3>
+            <h3 className="font-bold">Uploaded logo</h3>
             <div className="bg-white rounded-xl p-2 shadow-md w-70 text-center">
               {urlImage.name}
             </div>
@@ -92,7 +92,7 @@ export default function UploadFile({
               onClick={() => setUrlImage(CURRENT_URL_IMAGE)}
               disabled={false}
             >
-              Cambiar logo
+              Upload a new logo
             </Button>
           </div>
         ) : (
@@ -101,8 +101,8 @@ export default function UploadFile({
               <Upload />
             </span>
             <div className="flex justify-center flex-col gap-1 items-center">
-              <h3 className="font-bold">Sube el logo</h3>
-              <p className="text-sm text-gray-400">PNG, JPG hasta 5MB</p>
+              <h3 className="font-bold">Upload the logo</h3>
+              <p className="text-sm text-gray-400">PNG, JPG up to 5MB</p>
             </div>
           </div>
         )}

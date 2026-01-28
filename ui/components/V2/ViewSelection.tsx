@@ -14,8 +14,8 @@ export default function ViewSelection({
   return (
     <div className="w-full flex flex-col gap-6 mt-10">
       <TitleDescription
-        title="Selecciona una Camisa"
-        description="Elige una camisa base."
+        title="Select a shirt"
+        description="Choose a base shirt."
       />
       <div className="grid md:grid-cols-2 xs:grid-cols-1 sm:grid-cols-1 xl:grid-cols-3  items-center gap-6">
         {CURRENT_IMAGES.map((image: IImageLocalMockup, index: number) => (

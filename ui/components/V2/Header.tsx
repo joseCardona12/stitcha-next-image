@@ -7,25 +7,21 @@ interface IHeaderProps {
   tab: ITab;
 }
 export default function Header({ setTab, tab }: IHeaderProps) {
-  console.log("tab", tab.tab);
   return (
     <header className="w-full flex items-center justify-between pt-5 max-w-300 m-auto">
-      <div className="flex items-center gap-2">
-        <div className="w-6 h-6 rounded-md bg-purple-400"></div>
-        <h2 className="font-bold">Stitcha</h2>
-      </div>
+      <div className="flex items-center gap-2"></div>
       <ul className="flex items-center gap-2">
         <ItemButtonOnboarding
           isActive={tab.tab === "selection"}
-          text="1.Selección"
+          text="1. Select"
         />
         <ChevronRight className="text-gray-300" />
         <ItemButtonOnboarding
           isActive={tab.tab === "upload-file"}
-          text="2.Cargar archivo"
+          text="2. Upload File"
         />
         <ChevronRight className="text-gray-300" />
-        <ItemButtonOnboarding isActive={tab.tab === "edit"} text="3.Edición" />
+        <ItemButtonOnboarding isActive={tab.tab === "edit"} text="3. Edit" />
         <ChevronRight className="text-gray-300" />
         <ItemButtonOnboarding
           isActive={tab.tab === "generate-sharp"}

@@ -145,7 +145,7 @@ export default function GenerateImage({
 
   return (
     <div className="w-300 h-full flex flex-col gap-6 relative">
-      <TitleDescription title="Generar con OpenAI" description="Renderizado." />
+      <TitleDescription title="Generate with OpenAI" description="Rendering." />
       <div className="absolute top-0 right-0">
         <Button
           variant="default"
@@ -158,7 +158,7 @@ export default function GenerateImage({
           disabled={false}
         >
           <ChevronLeft />
-          Volver al Inicio
+          Go to Home
         </Button>
       </div>
       <div className="border border-gray-200 rounded-xl w-full h-full flex justify-center items-center relative">
@@ -191,7 +191,7 @@ export default function GenerateImage({
                 )}
               </Button>
               <Button variant="outline" disabled={false} onClick={handleReset}>
-                Generar una nueva imagen
+                Generate a new image
               </Button>
             </div>
           )}
@@ -201,7 +201,7 @@ export default function GenerateImage({
               disabled={false}
               onClick={handleGenerateImageAgain}
             >
-              Intentar de nuevo
+              Try again
             </Button>
           )}
         </div>

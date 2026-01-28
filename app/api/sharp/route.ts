@@ -13,7 +13,7 @@ export async function POST(req: Request) {
     const shadowPath = path.join(mockupDir, "shadow.png");
     const highlightPath = path.join(mockupDir, "highlight.png");
 
-    // 0. get mockup dimentions
+    // get mockup dimentions
     const baseImgMetadata = await sharp(baseImagePath).metadata();
     const bW = baseImgMetadata.width;
     const bH = baseImgMetadata.height;
@@ -21,36 +21,34 @@ export async function POST(req: Request) {
     if (!bW || !bH)
       throw new Error("No se pudo obtener dimensiones de la base");
 
-    // 1. PROCESAR LOGO ORIGINAL (Resize y Rotación)
+    // Original logo - rezise - rotation
     const logoBuffer = Buffer.from(logoData.split(",")[1], "base64");
     const logoResized = await sharp(logoBuffer)
       .resize(Math.round(coords.width), Math.round(coords.height))
       .rotate(coords.angle || 0)
       .toBuffer();
 
-    // 2. GENERAR EL MAPA DE RELIEVE (BUMP MAP)
-    // Extraemos el canal alfa y aplicamos blur para crear la "rampa" del relieve
+    // Generate relief map
     const alphaMask = await sharp(logoResized)
       .extractChannel("alpha")
-      .blur(1.5) // Controla qué tan suave es el bisel
+      .blur(1.5) //bezel management
       .toBuffer();
 
-    // Generamos las capas de luz y sombra internas
-    const lightMap = await sharp(alphaMask).negate().linear(2.9, 0).toBuffer(); // Brillo
-    const shadowMap = await sharp(alphaMask).linear(0.9, 0).toBuffer(); // Sombra
+    // Generate layers with light and internal shadow
+    const lightMap = await sharp(alphaMask).negate().linear(2.9, 0).toBuffer(); // shine
+    const shadowMap = await sharp(alphaMask).linear(0.9, 0).toBuffer(); // Shadow
 
-    // 3. APLICAR RELIEVE AL LOGO (Composición Interna)
-    // Esto hace que el relieve sea parte de la textura del logo
+    // 3. Relief to logo
     const logoWithRelief = await sharp(logoResized)
       .composite([
-        { input: shadowMap, blend: "multiply", top: 2, left: 2 }, // Desplazado hacia abajo
-        { input: lightMap, blend: "screen", top: -1, left: -1 }, // Desplazado hacia arriba
-        { input: logoResized, blend: "dest-in" }, // Máscara: Solo dentro del logo
+        { input: shadowMap, blend: "multiply", top: 2, left: 2 }, // moved down
+        { input: lightMap, blend: "screen", top: -1, left: -1 }, // moved up
+        { input: logoResized, blend: "dest-in" }, //mask
       ])
       .png()
       .toBuffer();
 
-    // 4. CREAR CAPA GLOBAL (Logo ya con relieve puesto en su posición final)
+    // 4. Create global layer
     const logoLayer = await sharp({
       create: {
         width: bW,
@@ -62,8 +60,6 @@ export async function POST(req: Request) {
       .composite([
         {
           input: logoWithRelief,
-          // coords.left y coords.top ya son coordenadas del centro (originX/Y: center)
-          // restar la mitad del ancho/alto para obtener la esquina superior izquierda
           top: Math.round(coords.top - coords.height / 2),
           left: Math.round(coords.left - coords.width / 2),
         },
@@ -71,8 +67,7 @@ export async function POST(req: Request) {
       .png()
       .toBuffer();
 
-    // 5. RECORTE ESTRICTO CON LA SILUETA DE LA PRENDA
-    // Usamos el alfa de shadow.png para asegurar que el logo no "flote" fuera de la tela
+    //Strict mask
     const garmentMask = await sharp(shadowPath)
       .resize(bW, bH)
       .extractChannel("alpha")
@@ -82,12 +77,12 @@ export async function POST(req: Request) {
       .composite([{ input: garmentMask, blend: "dest-in" }])
       .toBuffer();
 
-    // 6. COMPOSICIÓN FINAL: BASE + LOGO + SOMBRAS REALES
+    //Final composition: BASE + LOGO + REAL SHADOW
     const finalImage = await sharp(baseImagePath)
       .composite([
-        // Capa 1: El logo con relieve recortado a la prenda
+        // Layer 1: Logo with relief
         { input: maskedLogoLayer, blend: "over" },
-        // Capa 2: Sombras y arrugas de la tela (Multiply para realismo extremo)
+        // Layer 2: Shodow and wrinkles
         {
           input: await sharp(shadowPath).resize(bW, bH).toBuffer(),
           blend: "multiply",
