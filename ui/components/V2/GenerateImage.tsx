@@ -21,6 +21,7 @@ interface IGenerateImageProps {
   setTab: (value: ITab) => void;
   setUrlImage: (value: IUrlImage) => void;
   setPreviewSharp: (value: string) => void;
+  tab: ITab;
 }
 
 export default function GenerateImage({
@@ -34,6 +35,7 @@ export default function GenerateImage({
   setTab,
   setUrlImage,
   setPreviewSharp,
+  tab,
 }: IGenerateImageProps) {
   const [loadingImageOpenAI, setLoadingImageOpenAI] = useState(false);
   const [generateImageAgain, setGenerateImageAgain] = useState<boolean>(false);
@@ -144,23 +146,13 @@ export default function GenerateImage({
   }, [imageBaseSelect, urlImageLogo, generateImageAgain]);
 
   return (
-    <div className="w-300 h-full flex flex-col gap-6 relative">
-      <TitleDescription title="Generate with OpenAI" description="Rendering." />
-      <div className="absolute top-0 right-0">
-        <Button
-          variant="default"
-          className="flex items-center gap-2"
-          onClick={() => {
-            setTab({
-              tab: "selection",
-            });
-          }}
-          disabled={false}
-        >
-          <ChevronLeft />
-          Go to Home
-        </Button>
-      </div>
+    <div className="w-full md:w-300 h-screen md:h-full flex flex-col gap-6 relative">
+      <TitleDescription
+        title="Generate with OpenAI"
+        description="Rendering."
+        setTab={setTab}
+        tab={tab}
+      />
       <div className="border border-gray-200 rounded-xl w-full h-full flex justify-center items-center relative">
         {loadingImageOpenAI && !imageOpenAI && (
           <Loader2 className="w-6 h-6 animate-spin" />

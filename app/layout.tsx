@@ -29,9 +29,9 @@ export default function RootLayout({
         <meta name="theme-color" content="#ffffff" />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased m-0 p-0 flex flex-col min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased m-0 p-0 flex flex-col md:min-h-screen`}
       >
-        <div className="flex-1">{children}</div>
+        <div className="w-full md:flex-1">{children}</div>
       </body>
     </html>
   );

@@ -15,6 +15,7 @@ interface IEditProps {
   maskCanvasRef: RefObject<HTMLCanvasElement | null>;
   scaleRatioRef: RefObject<number>;
   setTab: (value: ITab) => void;
+  tab: ITab;
 }
 export default function Edit({
   urlImage,
@@ -23,6 +24,7 @@ export default function Edit({
   maskCanvasRef,
   scaleRatioRef,
   setTab,
+  tab,
 }: IEditProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -132,29 +134,16 @@ export default function Edit({
     };
   }, [urlImage.urlLogo, imageBaseSelect]);
   return (
-    <div className="w-300 h-full overflow-hidden flex flex-col gap-6 relative">
+    <div className="w-full h-screen md:w-300 md:h-full overflow-hidden flex flex-col gap-6 relative">
       <TitleDescription
         title="Edit Image"
         description="Edit the logo to generate image."
+        setTab={setTab}
+        tab={tab}
       />
-      <div className="absolute top-0 right-0">
-        <Button
-          variant="default"
-          className="flex items-center gap-2"
-          onClick={() => {
-            setTab({
-              tab: "selection",
-            });
-          }}
-          disabled={false}
-        >
-          <ChevronLeft />
-          Go to Home
-        </Button>
-      </div>
       <div
         ref={containerRef}
-        className="flex-1 flex items-center justify-center p-1 sm:p-2 lg:p-6 overflow-auto bg-gray-50 min-h-0"
+        className="flex-1 flex items-center justify-center sm:p-2 lg:p-6 overflow-auto min-h-0 p-1 border bg-gray-50 border-gray-200 rounded-md"
       >
         <div className="relative flex items-center justify-center w-full h-full">
           <canvas ref={canvasRef}></canvas>

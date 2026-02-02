@@ -18,7 +18,7 @@ export default function Button({
     default: "text-gray-500 bg-gray-100",
     black:
       "bg-black text-white hover:opacity-80 transition-opacity duration-100",
-    outline: "bg-white shadow-md",
+    outline: "bg-white shadow-md text-gray-500",
   };
   return (
     <button

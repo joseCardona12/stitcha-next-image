@@ -3,15 +3,19 @@ import TitleDescription from "./TitleDescription";
 import { Check, Upload } from "lucide-react";
 import { verifyFile } from "@/utils/verifyFile";
 import Button from "./Button";
-import { CURRENT_URL_IMAGE, IUrlImage } from "@/app/page";
+import { CURRENT_URL_IMAGE, ITab, IUrlImage } from "@/app/page";
 
 interface IUploadFileProps {
   setUrlImage: (value: IUrlImage) => void;
   urlImage: IUrlImage;
+  setTab: (value: ITab) => void;
+  tab: ITab;
 }
 export default function UploadFile({
   setUrlImage,
   urlImage,
+  setTab,
+  tab,
 }: IUploadFileProps) {
   const [hover, setHover] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -59,10 +63,12 @@ export default function UploadFile({
     reader.readAsDataURL(file as File);
   };
   return (
-    <div className="flex flex-col gap-6 w-300 h-full">
+    <div className="flex flex-col gap-6 w-full md:w-300 h-screen md:h-full p-4">
       <TitleDescription
         title="Upload file"
         description="Upload a file to render start"
+        setTab={setTab}
+        tab={tab}
       />
       <input
         ref={inputRef}
@@ -82,8 +88,8 @@ export default function UploadFile({
             <div className="bg-green-200 w-18 h-18 rounded-full flex justify-center items-center">
               <Check className="text-green-600 w-8 h-8" />
             </div>
-            <h3 className="font-bold">Uploaded logo</h3>
-            <div className="bg-white rounded-xl p-2 shadow-md w-70 text-center">
+            <h3 className="font-bold text-black">Uploaded logo</h3>
+            <div className="bg-white rounded-xl p-2 shadow-md w-70 text-center text-gray-400">
               {urlImage.name}
             </div>
             <span className="text-sm text-gray-500">{urlImage.size}</span>
@@ -97,11 +103,11 @@ export default function UploadFile({
           </div>
         ) : (
           <div className="flex flex-col gap-2 justify-center items-center">
-            <span className="border border-gray-100 w-15 h-15 rounded-full p-2 flex justify-center items-center ">
-              <Upload />
+            <span className="border border-gray-200 w-15 h-15 rounded-full p-2 flex justify-center items-center ">
+              <Upload className="text-gray-300" />
             </span>
             <div className="flex justify-center flex-col gap-1 items-center">
-              <h3 className="font-bold">Upload the logo</h3>
+              <h3 className="font-bold text-black">Upload the logo</h3>
               <p className="text-sm text-gray-400">PNG, JPG up to 5MB</p>
             </div>
           </div>

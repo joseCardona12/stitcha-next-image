@@ -8,26 +8,26 @@ interface IHeaderProps {
 }
 export default function Header({ setTab, tab }: IHeaderProps) {
   return (
-    <header className="w-full flex items-center justify-between pt-5 max-w-300 m-auto">
+    <header className="w-full flex items-center justify-between pt-5 md:max-w-300 m-auto">
       <div className="flex items-center gap-2"></div>
-      <ul className="flex items-center gap-2">
+      <ul className="hidden md:flex md:flex-row items-center gap-2">
         <ItemButtonOnboarding
           isActive={tab.tab === "selection"}
           text="1. Select"
         />
-        <ChevronRight className="text-gray-300" />
+        <ChevronRight className="hidden text-gray-300" />
         <ItemButtonOnboarding
           isActive={tab.tab === "upload-file"}
           text="2. Upload File"
         />
-        <ChevronRight className="text-gray-300" />
+        <ChevronRight className="hidden md:block text-gray-300" />
         <ItemButtonOnboarding isActive={tab.tab === "edit"} text="3. Edit" />
-        <ChevronRight className="text-gray-300" />
+        <ChevronRight className="hidden md:block text-gray-300" />
         <ItemButtonOnboarding
           isActive={tab.tab === "generate-sharp"}
           text="4. Sharp"
         />
-        <ChevronRight className="text-gray-300" />
+        <ChevronRight className="hidden md:block text-gray-300" />
         <ItemButtonOnboarding
           isActive={tab.tab === "generate-image"}
           text="5. OpenAI"

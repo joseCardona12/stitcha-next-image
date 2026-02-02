@@ -34,7 +34,6 @@ export default function Footer({
   const [loadingGenerate, setLoadingGenerate] = useState<boolean>(false);
   const is_edit_generate =
     tab.tab === "edit" && urlImage.urlLogo && imageBaseSelect.base;
-  console.log("is edit", is_edit_generate);
 
   const handleBack = () => {
     if (tab.tab === "selection") {
@@ -148,8 +147,8 @@ export default function Footer({
     if (is_edit_generate) generateUrl();
   };
   return (
-    <footer className="w-full flex justify-center mt-auto">
-      <div className="max-w-[1200px] w-full flex justify-between items-center">
+    <footer className="w-full flex justify-center mt-auto bg-gray-50 p-4">
+      <div className="md:max-w-[1200px] w-full flex justify-between items-center">
         <Button
           onClick={handleBack}
           disabled={false}

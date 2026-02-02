@@ -16,7 +16,7 @@ export default function Card({
   const [hover, setHover] = useState<boolean>(false);
   return (
     <div
-      className={`${isActive ? "border-2 border-purple-400" : ""} ${isActive ? "hover:border-purple-400" : ""} border border-gray-100 rounded-xl bg-gray-50 cursor-pointer hover:border-gray-200 relative hover:opacity-90 transition-opacity duration-150`}
+      className={`${isActive ? "border-2 border-purple-400" : ""} ${isActive ? "hover:border-purple-400" : ""} border border-gray-100 rounded-xl bg-white cursor-pointer hover:border-gray-200 relative hover:opacity-90 transition-opacity duration-150`}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
       onClick={onClick}
@@ -27,7 +27,7 @@ export default function Card({
         className="w-full h-full object-cover"
       />
       {hover && (
-        <span className="absolute bottom-5 left-5 text-md font-bold">
+        <span className="absolute bottom-5 left-5 text-md font-bold text-black">
           {title}
         </span>
       )}

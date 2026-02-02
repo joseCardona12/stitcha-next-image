@@ -9,10 +9,12 @@ import { ITab } from "@/app/page";
 interface IGenerateSharpProps {
   urlImageSharp: string;
   setTab: (value: ITab) => void;
+  tab: ITab;
 }
 export default function GenerateSharp({
   urlImageSharp,
   setTab,
+  tab,
 }: IGenerateSharpProps) {
   const [loadingDownload, setLoadingDownload] = useState<boolean>(false);
   const handleDownload = async () => {
@@ -27,23 +29,13 @@ export default function GenerateSharp({
     }
   };
   return (
-    <div className="w-300 h-full flex flex-col gap-6 relative">
-      <TitleDescription title="Generate with Sharp" description="Rendering" />
-      <div className="absolute top-0 right-0">
-        <Button
-          variant="default"
-          className="flex items-center gap-2"
-          onClick={() => {
-            setTab({
-              tab: "selection",
-            });
-          }}
-          disabled={false}
-        >
-          <ChevronLeft />
-          Go to Home
-        </Button>
-      </div>
+    <div className="w-full md:w-300 h-screen md:h-full flex flex-col gap-6 relative p-4">
+      <TitleDescription
+        title="Generate with Sharp"
+        description="Rendering"
+        tab={tab}
+        setTab={setTab}
+      />
       <div className="border border-gray-200 rounded-xl w-full h-full flex justify-center items-center overflow-hidden relative">
         <div className="w-full h-full flex justify-center items-center rounded-md">
           <img

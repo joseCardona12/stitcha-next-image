@@ -14,6 +14,7 @@ import {
 import { useRef, useState } from "react";
 import * as fabric from "fabric";
 import GenerateSharp from "@/ui/components/V2/GenerateSharp";
+import BackToHome from "@/ui/components/V2/BackToHome";
 
 export interface ITab {
   tab: string;
@@ -62,17 +63,24 @@ export default function Home() {
   const scaleRatioRef = useRef(1);
 
   return (
-    <div className="bg-white flex flex-col gap-4 w-full">
+    <div className="flex flex-col gap-4 w-full bg-gray-50">
       <Header setTab={setTab} tab={tab} />
       <Separador />
-      <main className="max-w-300 m-auto h-[75vh] overflow-y-scroll">
+      <main className="w-full md:max-w-300 md:m-auto md:h-[75vh] md:overflow-y-scroll relative">
         {tab.tab === "selection" ? (
           <ViewSelection
             setImageBaseSelect={setImageBaseSelect}
             imageBaseSelect={imageBaseSelect}
+            setTab={setTab}
+            tab={tab}
           />
         ) : tab.tab === "upload-file" ? (
-          <UploadFile setUrlImage={setUrlImage} urlImage={urlImage} />
+          <UploadFile
+            setUrlImage={setUrlImage}
+            urlImage={urlImage}
+            setTab={setTab}
+            tab={tab}
+          />
         ) : tab.tab === "edit" ? (
           <Edit
             urlImage={urlImage}
@@ -81,6 +89,7 @@ export default function Home() {
             maskCanvasRef={maskCanvasRef}
             scaleRatioRef={scaleRatioRef}
             setTab={setTab}
+            tab={tab}
           />
         ) : tab.tab === "generate-image" ? (
           <GenerateImage
@@ -94,12 +103,18 @@ export default function Home() {
             setTab={setTab}
             setPreviewSharp={setPreviewSharp}
             setUrlImage={setUrlImage}
+            tab={tab}
           />
         ) : tab.tab === "generate-sharp" ? (
-          <GenerateSharp urlImageSharp={previewSharp} setTab={setTab} />
+          <GenerateSharp
+            urlImageSharp={previewSharp}
+            setTab={setTab}
+            tab={tab}
+          />
         ) : (
           ""
         )}
+        <BackToHome setTab={setTab} />
       </main>
       <Separador />
       <Footer

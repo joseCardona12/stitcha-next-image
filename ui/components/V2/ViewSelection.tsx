@@ -1,19 +1,25 @@
 import { CURRENT_IMAGES, IImageLocalMockup } from "@/utils/constants/images";
 import Card from "./Card";
 import TitleDescription from "./TitleDescription";
-import { IUrlImage } from "@/app/page";
+import { ITab, IUrlImage } from "@/app/page";
 
 interface IViewSelectionProps {
   setImageBaseSelect: (value: IImageLocalMockup) => void;
   imageBaseSelect: IImageLocalMockup;
+  setTab: (value: ITab) => void;
+  tab: ITab;
 }
 export default function ViewSelection({
   setImageBaseSelect,
   imageBaseSelect,
+  setTab,
+  tab,
 }: IViewSelectionProps) {
   return (
-    <div className="w-full flex flex-col gap-6 mt-10">
+    <div className="w-full flex flex-col gap-6 md:mt-10 p-4">
       <TitleDescription
+        setTab={setTab}
+        tab={tab}
         title="Select a shirt"
         description="Choose a base shirt."
       />
